@@ -138,12 +138,26 @@ class SaleItem(models.Model):
     qty = models.FloatField()
     item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
-    total_amt = models.FloatField()
+    total_amt = models.FloatField(editable=False,default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         self.total_amt = self.qty * self.item_price.item_price
         super(SaleItem, self).save(*args, **kwargs)
+
+        inventory = Inventory.objects.filter(item=self.item).order_by('-id').first()
+        if inventory:
+            totalBal = inventory.total_bal_qty - self.qty
+
+        Inventory.objects.create(
+            item=self.item,
+            purchase=None,
+            sale=self.sales_invoice,
+            stock=None,
+            pur_qty=None,
+            sale_qty=self.qty,
+            total_bal_qty=totalBal
+        )
 
     class Meta:
         verbose_name_plural = '9. Sales Item'
@@ -156,7 +170,7 @@ class PurchaseItem(models.Model):
     qty = models.FloatField()
     item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
-    total_amt = models.FloatField(editable=False,default=0)
+    total_amt = models.FloatField(editable=False, default=0)
     pur_date = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -186,7 +200,7 @@ class PurchaseItem(models.Model):
 class Inventory(models.Model):
     item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, default=0, null=True)
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, default=0,null=True)
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, default=0, null=True)
     sale = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE, default=0, null=True)
     pur_qty = models.FloatField(default=0, null=True)
     sale_qty = models.FloatField(default=0, null=True)
@@ -194,3 +208,5 @@ class Inventory(models.Model):
 
     class Meta:
         verbose_name_plural = '10. Inventories'
+    def __str__(self):
+        return str(self.item)
