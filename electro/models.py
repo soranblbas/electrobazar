@@ -32,8 +32,13 @@ class Customer(models.Model):
 
 # Sales Invoice
 class SaleInvoice(models.Model):
+    STATUS = (
+        ('مدفوع', 'مدفوع'),
+        ('غير مدفوع', 'غير مدفوع'),
+    )
     invoice_number = models.SlugField(default=0)
     customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    status = models.CharField(max_length=25,choices=STATUS)
 
     class Meta:
         verbose_name_plural = '3. Sale Invoice'
@@ -76,16 +81,27 @@ class ItemDetail(models.Model):
         return self.title
 
 
+class Price_List(models.Model):
+    price_list = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return str(self.price_list)
+
+    class Meta:
+        verbose_name_plural = 'Price_List'
+
+
 # Price List
 class ItemPrice(models.Model):
-    PRICELIST = (
-        ('مفرد', 'مفرد'),
-        ('جملة', 'جملة'),
-        ('شراء', 'شراء'),
-    )
+    # PRICELIST = (
+    #     ('مفرد', 'مفرد'),
+    #     ('جملة', 'جملة'),
+    #
+    #     ('شراء', 'شراء'),
+    # )
 
     item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
-    price_list = models.CharField(max_length=20, null=True, choices=PRICELIST)
+    price_list = models.ForeignKey(Price_List, on_delete=models.CASCADE)
     item_price = models.FloatField()
 
     class Meta:
@@ -116,19 +132,19 @@ class Purchase(models.Model):
 
 
 # Stock
-class Stock(models.Model):
-    item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-    qty = models.FloatField()
-    price = models.FloatField()
-    total_amt = models.FloatField()
-    pur_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name_plural = '8. Stock'
-
-    def __str__(self):
-        return str(self.item)
+# class Stock(models.Model):
+#     item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
+#     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+#     qty = models.FloatField()
+#     price = models.FloatField()
+#     total_amt = models.FloatField()
+#     pur_date = models.DateTimeField(auto_now_add=True)
+#
+#     class Meta:
+#         verbose_name_plural = '8. Stock'
+#
+#     def __str__(self):
+#         return str(self.item)
 
 
 # Sales Item
@@ -138,7 +154,7 @@ class SaleItem(models.Model):
     qty = models.FloatField()
     item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
-    total_amt = models.FloatField(editable=False,default=0)
+    total_amt = models.FloatField(editable=False, default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -148,12 +164,13 @@ class SaleItem(models.Model):
         inventory = Inventory.objects.filter(item=self.item).order_by('-id').first()
         if inventory:
             totalBal = inventory.total_bal_qty - self.qty
+        else:
+            totalBal = 0
 
         Inventory.objects.create(
             item=self.item,
             purchase=None,
             sale=self.sales_invoice,
-            stock=None,
             pur_qty=None,
             sale_qty=self.qty,
             total_bal_qty=totalBal
@@ -186,7 +203,6 @@ class PurchaseItem(models.Model):
             item=self.item,
             purchase=self.purchase_invoice,
             sale=None,
-            stock=None,
             pur_qty=self.qty,
             sale_qty=None,
             total_bal_qty=totalBal
@@ -200,13 +216,13 @@ class PurchaseItem(models.Model):
 class Inventory(models.Model):
     item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, default=0, null=True)
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, default=0, null=True)
     sale = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE, default=0, null=True)
     pur_qty = models.FloatField(default=0, null=True)
     sale_qty = models.FloatField(default=0, null=True)
     total_bal_qty = models.FloatField(default=0)
 
     class Meta:
-        verbose_name_plural = '10. Inventories'
+        verbose_name_plural = '10. Stock Details'
+
     def __str__(self):
         return str(self.item)

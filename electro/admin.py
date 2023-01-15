@@ -63,7 +63,7 @@ class CustomerPagination(admin.ModelAdmin):
 
 @admin.register(Inventory)
 class CustomerPagination(admin.ModelAdmin):
-    list_display = ('item', 'purchase', 'sale', 'stock', 'pur_qty', 'sale_qty', 'total_bal_qty')
+    list_display = ('item', 'purchase', 'sale','pur_qty', 'sale_qty', 'total_bal_qty')
     list_display_links = ['purchase', 'sale', ]
 
 
@@ -73,4 +73,5 @@ admin.site.register(Unit)
 admin.site.register(ItemDetail)
 
 admin.site.register(Customer)
-admin.site.register(Stock)
+admin.site.register(Price_List)
+
