@@ -10,6 +10,10 @@ def index(request):
     return render(request, 'electro/index.html')
 
 
+def base(request):
+    return render(request, 'electro/base.html')
+
+
 def loginPage(request):
     if request.user.is_authenticated:
         return redirect('electro/index.html')
@@ -33,3 +37,11 @@ def loginPage(request):
 def logoutUser(request):
     logout(request)
     return redirect('login')
+
+
+# repoerting
+def sales_repoert(request):
+    s_reports = SaleItem.objects.select_related()
+
+    context = {'s_reports':s_reports}
+    return render(request, 'electro/reports/sales_report.html', context)
