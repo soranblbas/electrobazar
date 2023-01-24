@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'electro.apps.ElectroConfig',
+    'django_filters',
 
 ]
 

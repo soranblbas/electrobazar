@@ -10,7 +10,7 @@
 <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-        <a href="index.html" class="logo d-flex align-items-center">
+        <a href="{% url 'index' %}" class="logo d-flex align-items-center">
             <img src="{% static 'electro/assets/img/logo.png' %}" alt="">
             <span class="d-none d-lg-block">Electro Bazar</span>
         </a>
@@ -57,8 +57,8 @@
 <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.5/api/sum().js"></script>
 
 
-<script src="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css"></script>
-<script src="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css"></script>
+<script rel="stylesheet" type="text/css" src="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css"></script>
+<script rel="stylesheet" type="text/css"  src="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css"></script>
 
 
 {#<script src="https://code.jquery.com/jquery-3.5.1.js"></script>#}
@@ -66,12 +66,14 @@
 <script src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.print.min.js"></script>
 
-
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+<script src="https://cdn.datatables.net/datetime/1.2.0/js/dataTables.dateTime.min.js"></script>
+<script src=""></script>
 
 
 <script type="text/javascript">
+
+
     $(document).ready(function () {
 
 

@@ -18,16 +18,16 @@
         #}#}
 
     </style>
-
-    <form class="form-a">
-
-
-        From: <input type="date" value={{ myFilter.form.max_date }}</input>
-        To: <input type="date" value={{ myFilter.form.min_date }}</input>
-        <button type="submit" class="btn btn-b">Search</button>
-
-
-    </form>
+<table border="0" cellspacing="5" cellpadding="5">
+        <tbody><tr>
+            <td>Minimum date:</td>
+            <td><input type="text" id="min" name="min"></td>
+        </tr>
+        <tr>
+            <td>Maximum date:</td>
+            <td><input type="text" id="max" name="max"></td>
+        </tr>
+    </tbody>
     <table id="example1" class="table table-striped" style="width:100%">
 
         <thead>
@@ -37,7 +37,7 @@
 
             <th>رقم الوصل</th>
             <th>اسم العميل</th>
-            <th>الحالة</th>
+
             <th>اسم المادة</th>
             <th>السعر</th>
             <th>العدد</th>
@@ -48,17 +48,16 @@
         </tr>
         </thead>
         <tbody>
-        {% for i in  s_reports %}
+        {% for i in  p_reports %}
 
             <tr>
-                <td>{{ i.sales_invoice.invoice_number }}</td>
-                <td>{{ i.sales_invoice.customer_name }}</td>
-                <td>{{ i.sales_invoice.status }}</td>
+                <td>{{ i.purchase_invoice.invoice_number }}</td>
+                <td>{{ i.purchase_invoice.vendor }}</td>
                 <td>{{ i.item }}</td>
-                <td>{{ i.item_price.item_price }}</td>
+                <td>{{ i.item_price }}</td>
                 <td>{{ i.qty }}</td>
                 <td>{{ i.total_amt }}</td>
-                <td>{{ i.sale_date }}</td>
+                <td>{{ i.pur_date}}</td>
 
 
             </tr>
@@ -73,13 +72,13 @@
         <th style="background-color: #e8c3c7"></th>
         <th style="background-color: #beecc8"></th>
         <th style="background-color: #c9d9ee"></th>
-        <th></th>
+
 
 
         </tfoot>
 
 
     </table>
-
+</table>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 from django.utils.crypto import get_random_string
 
 
@@ -6,9 +7,10 @@ from django.utils.crypto import get_random_string
 class Vendor(models.Model):
     full_name = models.CharField(max_length=50)
     # photo = models.ImageField(upload_to="vendor/")
-    address = models.TextField()
-    mobile = models.CharField(max_length=15)
-    status = models.BooleanField(default=False)
+    address = models.TextField(blank=True)
+    mobile = models.CharField(max_length=15, blank=True)
+    status = models.BooleanField(default=False, blank=True)
+    note = models.TextField(blank=True)
 
     class Meta:
         verbose_name_plural = '1. Vendors'
@@ -20,8 +22,9 @@ class Vendor(models.Model):
 # Customer
 class Customer(models.Model):
     customer_name = models.CharField(max_length=50, blank=True)
-    customer_mobile = models.CharField(max_length=50)
-    customer_address = models.TextField()
+    customer_mobile = models.CharField(max_length=50, blank=True)
+    customer_address = models.TextField(blank=True)
+    city = models.CharField(max_length=50, blank=True)
 
     class Meta:
         verbose_name_plural = '2. Customers'
@@ -30,32 +33,72 @@ class Customer(models.Model):
         return self.customer_name
 
 
-# Sales Invoice
 class SaleInvoice(models.Model):
     STATUS = (
         ('مدفوع', 'مدفوع'),
         ('غير مدفوع', 'غير مدفوع'),
     )
-    invoice_number = models.SlugField(default=0)
+    invoice_number = models.SlugField(editable=False)
     customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    status = models.CharField(max_length=25,choices=STATUS)
+    piad = models.BooleanField(default='No')
 
     class Meta:
         verbose_name_plural = '3. Sale Invoice'
 
     def save(self, *args, **kwargs):
         CODE_LENGTH = 5
-
-        # self.p_search = '-'.join((slugify(self.project_name),))
+        #
+        # # self.p_search = '-'.join((slugify(self.project_name),))
         self.invoice_number = 'SINV-' + get_random_string(CODE_LENGTH).upper()
-
+        #
+        # # a = str(SaleItem.objects.aggregate(Sum('total_amt'))).replace("}", " ")
+        # #
+        # # b = a[19:]
+        # # c = float(b)
+        # mm = SaleItem.objects.all()
+        # ww = SaleInvoice.objects.all()
+        # d = []
+        # for i in ww:
+        #     for j in mm:
+        #         if i.id == j.sales_invoice_id:
+        #             # #     if self.id == i.id:
+        #             self.invoice_number = j.total_amt
+        #
+        #             # self.invoice_number = str(a) - self.payment_entry.paid_amount
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.customer_name)
+        return str(self.invoice_number)
+
+
+class Payment_Entry(models.Model):
+    invoice_number = models.SlugField(editable=False)
+    sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
+    paid_amount = models.FloatField(blank=True)
+    payment_date = models.DateTimeField(blank=True)
+    note = models.TextField(blank=True)
+
+    def save(self, *args, **kwargs):
+        CODE_LENGTH = 5
+
+        # self.p_search = '-'.join((slugify(self.project_name),))
+        self.invoice_number = 'PINV-' + get_random_string(CODE_LENGTH).upper()
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = '8. Payment Entry'
+
+    def __str__(self):
+        return str(self.sales_invoice.invoice_number)
+
+
+# Sales Invoice
 
 
 # Unit
+
+
 class Unit(models.Model):
     title = models.CharField(max_length=50)
     short_name = models.CharField(max_length=50)
@@ -70,7 +113,7 @@ class Unit(models.Model):
 # Item Details
 class ItemDetail(models.Model):
     title = models.CharField(max_length=50)
-    detail = models.TextField()
+    detail = models.TextField(blank=True)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
 
     # photo = models.ImageField(upload_to="product/")
@@ -131,27 +174,14 @@ class Purchase(models.Model):
         return f' {self.invoice_number}'
 
 
-# Stock
-# class Stock(models.Model):
-#     item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
-#     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-#     qty = models.FloatField()
-#     price = models.FloatField()
-#     total_amt = models.FloatField()
-#     pur_date = models.DateTimeField(auto_now_add=True)
-#
-#     class Meta:
-#         verbose_name_plural = '8. Stock'
-#
-#     def __str__(self):
-#         return str(self.item)
+# payment entry
 
 
 # Sales Item
 class SaleItem(models.Model):
     sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
     item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
-    qty = models.FloatField()
+    qty = models.PositiveSmallIntegerField(default=1)
     item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
     total_amt = models.FloatField(editable=False, default=0)
@@ -159,6 +189,7 @@ class SaleItem(models.Model):
 
     def save(self, *args, **kwargs):
         self.total_amt = self.qty * self.item_price.item_price
+        # self.total_amt = self.total_amt - self.payment_entry.paid_amount
         super(SaleItem, self).save(*args, **kwargs)
 
         inventory = Inventory.objects.filter(item=self.item).order_by('-id').first()
@@ -189,6 +220,7 @@ class PurchaseItem(models.Model):
     # price = models.FloatField()
     total_amt = models.FloatField(editable=False, default=0)
     pur_date = models.DateTimeField(auto_now_add=True)
+    note = models.TextField(blank=True)
 
     def save(self, *args, **kwargs):
         self.total_amt = self.qty * self.item_price.item_price

@@ -10,5 +10,6 @@ urlpatterns = [
     # REPORTS
 
     path('sales_report', views.sales_repoert, name="sales_report"),
+    path('purchase_report', views.purchase_repoert, name="purchase_report"),
 
 ]

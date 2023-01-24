@@ -16,6 +16,8 @@ class ProfileAdmin(admin.ModelAdmin):
     class Meta:
         model = SaleInvoice
 
+    list_display = ('invoice_number', 'customer_name')
+
 
 class PurchasesItem(admin.TabularInline):
     model = PurchaseItem
@@ -63,7 +65,7 @@ class CustomerPagination(admin.ModelAdmin):
 
 @admin.register(Inventory)
 class CustomerPagination(admin.ModelAdmin):
-    list_display = ('item', 'purchase', 'sale','pur_qty', 'sale_qty', 'total_bal_qty')
+    list_display = ('item', 'purchase', 'sale', 'pur_qty', 'sale_qty', 'total_bal_qty')
     list_display_links = ['purchase', 'sale', ]
 
 
@@ -74,4 +76,4 @@ admin.site.register(ItemDetail)
 
 admin.site.register(Customer)
 admin.site.register(Price_List)
-
+admin.site.register(Payment_Entry)
