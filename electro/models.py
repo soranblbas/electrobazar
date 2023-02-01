@@ -41,6 +41,7 @@ class SaleInvoice(models.Model):
     invoice_number = models.SlugField(editable=False)
     customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
     piad = models.BooleanField(default='No')
+    date = models.DateTimeField()
 
     class Meta:
         verbose_name_plural = '3. Sale Invoice'
@@ -158,6 +159,7 @@ class ItemPrice(models.Model):
 class Purchase(models.Model):
     invoice_number = models.SlugField(default=0)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    date = models.DateTimeField()
 
     class Meta:
         verbose_name_plural = '8. Purchase Invoice'
