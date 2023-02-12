@@ -28,13 +28,14 @@
 
 
     </form>
+    <h2 class="text-center"> ملخص التسديدات </h2>
     <table id="example2" class="table table-striped" style="background-color: #68a7e5">
 
         <thead>
 
         <tr>
 
-
+            <th>اسم العميل</th>
             <th>رقم الوصل</th>
             <th>رقم الوصل المبیعات</th>
             <th>نسبە الدفع</th>
@@ -45,9 +46,10 @@
         </tr>
         </thead>
         <tbody>
-        {% for i in  payment_repoert %}
+        {% for i in  payment_report %}
 
             <tr>
+                <td>{{ i.customer_name }}</td>
                 <td>{{ i.invoice_number }}</td>
                 <td>{{ i.sales_invoice }}</td>
                 <td>{{ i.paid_amount }}</td>
@@ -61,7 +63,7 @@
 
         <th></th>
         <th></th>
-
+  <th></th>
         <th style="background-color: #e8c3c7"></th>
 
         <th></th>

@@ -75,11 +75,11 @@ def purchase_report(request):
 
 
 def payment_report(request):
-    payment_repoert = Payment_Entry.objects.select_related()
-    myFilter = Purchase_Filter(request.GET, queryset=payment_repoert)
+    payment_report = Payment_Entry.objects.select_related()
+    myFilter = Purchase_Filter(request.GET, queryset=payment_report)
     payment_repoert = myFilter.qs
 
-    context = {'payment_repoert': payment_repoert, 'myFilter': myFilter}
+    context = {'payment_report': payment_report, 'myFilter': myFilter}
     return render(request, 'electro/reports/payment_report.html', context)
 
 
@@ -96,10 +96,10 @@ def stock_report(request):
     #     total_paid=Sum('paid_amount'))
     # # cust_t_sale = SaleItem.objects.select_related().values_list('sales_invoice__customer_name__customer_name').annotate(
     # #     total_paid=Sum('total_amt'))
-    # #
-    # context = {'c_balance_report': c_balance_report, 'b_report': b_report,
-    #            'cust_t_payment': cust_t_payment, 'cust_t_sale': cust_t_sale}
-    # return render(request, 'electro/reports/customer_balance.html', context)
+    #
+    context = {'c_balance_report': c_balance_report, 'b_report': b_report,
+               'cust_t_payment': cust_t_payment, 'cust_t_sale': cust_t_sale}
+    return render(request, 'electro/reports/customer_balance.html', context)
 
 
 def customer_balance(request):
