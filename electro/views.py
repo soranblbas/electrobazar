@@ -88,3 +88,47 @@ def stock_report(request):
 
     context = {'stock_report': stock_report}
     return render(request, 'electro/reports/stock_report.html', context)
+
+    # def customer_balance(request):
+    c_balance_report = SaleItem.objects.select_related()
+    b_report = Payment_Entry.objects.select_related()
+    # cust_t_payment = Payment_Entry.objects.select_related().values_list('customer_name__customer_name').annotate(
+    #     total_paid=Sum('paid_amount'))
+    # # cust_t_sale = SaleItem.objects.select_related().values_list('sales_invoice__customer_name__customer_name').annotate(
+    # #     total_paid=Sum('total_amt'))
+    # #
+    # context = {'c_balance_report': c_balance_report, 'b_report': b_report,
+    #            'cust_t_payment': cust_t_payment, 'cust_t_sale': cust_t_sale}
+    # return render(request, 'electro/reports/customer_balance.html', context)
+
+
+def customer_balance(request):
+    cc_balance_report = SaleItem.objects.select_related()
+    bb_report = Payment_Entry.objects.select_related()
+
+    context = {'cc_balance_report': cc_balance_report, 'bb_report': bb_report}
+    return render(request, 'electro/reports/customer_balance.html', context)
+
+
+def customer_total_report_summary(request):
+    customer_ids = SaleItem.objects.values_list('sales_invoice__customer_name_id', flat=True).distinct()
+    c_balance_report = {}
+
+    for customer_id in customer_ids:
+        customer_name = Customer.objects.get(id=customer_id).customer_name
+
+        sale_items = SaleItem.objects.filter(sales_invoice__customer_name_id=customer_id)
+        payments = Payment_Entry.objects.filter(customer_name_id=customer_id)
+
+        total_invoice_amount = sum(sale_item.total_amt for sale_item in sale_items)
+        total_paid_amount = sum(payment.paid_amount for payment in payments)
+        actual_credit = total_invoice_amount - total_paid_amount
+
+        c_balance_report[customer_name] = {
+            'total_invoice_amount': total_invoice_amount,
+            'total_paid_amount': total_paid_amount,
+            'actual_credit': actual_credit
+        }
+
+    context = {'c_balance_report': c_balance_report}
+    return render(request, 'electro/reports/total_customer_summary_report.html', context)

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.utils.crypto import get_random_string
@@ -51,21 +52,7 @@ class SaleInvoice(models.Model):
         #
         # # self.p_search = '-'.join((slugify(self.project_name),))
         self.invoice_number = 'SINV-' + get_random_string(CODE_LENGTH).upper()
-        #
-        # # a = str(SaleItem.objects.aggregate(Sum('total_amt'))).replace("}", " ")
-        # #
-        # # b = a[19:]
-        # # c = float(b)
-        # mm = SaleItem.objects.all()
-        # ww = SaleInvoice.objects.all()
-        # d = []
-        # for i in ww:
-        #     for j in mm:
-        #         if i.id == j.sales_invoice_id:
-        #             # #     if self.id == i.id:
-        #             self.invoice_number = j.total_amt
-        #
-        #             # self.invoice_number = str(a) - self.payment_entry.paid_amount
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -75,6 +62,8 @@ class SaleInvoice(models.Model):
 class Payment_Entry(models.Model):
     invoice_number = models.SlugField(editable=False)
     sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
+    customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
     paid_amount = models.FloatField(blank=True)
     payment_date = models.DateTimeField(blank=True)
     note = models.TextField(blank=True)
@@ -182,6 +171,7 @@ class Purchase(models.Model):
 # Sales Item
 class SaleItem(models.Model):
     sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
+
     item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
     qty = models.PositiveSmallIntegerField(default=1)
     item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
@@ -190,8 +180,13 @@ class SaleItem(models.Model):
     sale_date = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
+
         self.total_amt = self.qty * self.item_price.item_price
         # self.total_amt = self.total_amt - self.payment_entry.paid_amount
+        # item_in_stock = PurchaseItem.objects.filter(item=self.item).first()
+        # if item_in_stock:
+        #     raise ValidationError("Quantity cannot be greater than the stock amount.")
+
         super(SaleItem, self).save(*args, **kwargs)
 
         inventory = Inventory.objects.filter(item=self.item).order_by('-id').first()

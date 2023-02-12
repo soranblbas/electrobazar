@@ -77,3 +77,8 @@ admin.site.register(ItemDetail)
 admin.site.register(Customer)
 admin.site.register(Price_List)
 admin.site.register(Payment_Entry)
+
+
+admin.site.site_header = "Electro Bazar Admin"
+admin.site.site_title = "Electro Bazar Admin Portal"
+admin.site.index_title = "Welcome to Electro Bazar Retailer Portal"
