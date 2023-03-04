@@ -118,17 +118,24 @@ def customer_total_report_summary(request):
         customer_name = Customer.objects.get(id=customer_id).customer_name
 
         sale_items = SaleItem.objects.filter(sales_invoice__customer_name_id=customer_id)
-        payments = Payment_Entry.objects.filter(customer_name_id=customer_id)
+        payments = Payment_Entry.objects.filter(customer_name_id=customer_id).order_by('-payment_date')
 
         total_invoice_amount = sum(sale_item.total_amt for sale_item in sale_items)
         total_paid_amount = sum(payment.paid_amount for payment in payments)
         actual_credit = total_invoice_amount - total_paid_amount
 
+        last_payment = payments.first()
+        balance_before_last_payment = actual_credit + last_payment.paid_amount if last_payment else actual_credit
+
         c_balance_report[customer_name] = {
             'total_invoice_amount': total_invoice_amount,
             'total_paid_amount': total_paid_amount,
-            'actual_credit': actual_credit
+            'actual_credit': actual_credit,
+            'last_payment': last_payment.paid_amount if last_payment else 0,
+            'balance_before_last_payment': balance_before_last_payment
         }
 
     context = {'c_balance_report': c_balance_report}
     return render(request, 'electro/reports/total_customer_summary_report.html', context)
+
+

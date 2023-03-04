@@ -67,6 +67,7 @@ class Payment_Entry(models.Model):
     paid_amount = models.FloatField(blank=True)
     payment_date = models.DateTimeField(blank=True)
     note = models.TextField(blank=True)
+    old_balance = models.DecimalField(max_digits=20, decimal_places=2, default=0,editable=False)
 
     def save(self, *args, **kwargs):
         CODE_LENGTH = 5

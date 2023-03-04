@@ -29,6 +29,8 @@
             <th>اسم العميل</th>
             <th>المبيعات</th>
             <th>التسديدات</th>
+            <th> الرصيد قبل الدفعة الأخيرة</th>
+            <th> اخر‌التسديدات</th>
             <th>المتبقي</th>
 
 
@@ -40,7 +42,10 @@
                 <td>{{ customer }}</td>
                 <td>{{ data.total_invoice_amount }}</td>
                 <td>{{ data.total_paid_amount }}</td>
+                <td>{{ data.balance_before_last_payment }}</td>
+                <td>{{ data.last_payment }}</td>
                 <td>{{ data.actual_credit }}</td>
+
             </tr>
         {% endfor %}
         </tbody>
@@ -52,6 +57,7 @@
         <th style="background-color: #beecc8"></th>
 
         <th style="background-color: #e8c3c7"></th>
+           <th style="background-color: #e8c3c7"></th>
 
 
         </tfoot>
