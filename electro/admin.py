@@ -8,6 +8,11 @@ class SalesItem(admin.TabularInline):
     model = SaleItem
     extra = 1
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "item":
+            kwargs["queryset"] = Item.objects.exclude(price_list='شراء')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 @admin.register(SaleInvoice)
 class ProfileAdmin(admin.ModelAdmin):
@@ -16,12 +21,21 @@ class ProfileAdmin(admin.ModelAdmin):
     class Meta:
         model = SaleInvoice
 
-    list_display = ('invoice_number', 'customer_name')
+    # def show_sales_total(self, obj):
+    #     total_sales = sum(sale.total_amt for sale in obj.sales.all())
+    #     return format_html('<b>{}</b>', total_sales)
+
+    list_display = ('invoice_number', 'customer_name', 'total_sales_amount', 'date')
 
 
 class PurchasesItem(admin.TabularInline):
     model = PurchaseItem
     extra = 1
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "item":
+            kwargs["queryset"] = Item.objects.exclude(price_list__in=['مفرد', 'جملة'])
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Purchase)
@@ -31,10 +45,12 @@ class ProfileAdmin(admin.ModelAdmin):
     class Meta:
         model = Purchase
 
+    list_display = ('invoice_number', 'vendor', 'total_purchase_amount', 'date')
 
-@admin.register(ItemPrice)
+
+@admin.register(Item)
 class CustomerPagination(admin.ModelAdmin):
-    list_display = ('item', 'price_list', 'item_price')
+    list_display = ('name', 'price_list', 'price')
     # list_filter = ("client_name", "status", "date_created")
     # list_display_links = ('client_name',)
     # list_per_page = 20
@@ -51,14 +67,14 @@ class CustomerPagination(admin.ModelAdmin):
 
 @admin.register(PurchaseItem)
 class CustomerPagination(admin.ModelAdmin):
-    list_display = ('item', 'qty', 'item_price', 'total_amt', 'pur_date')
+    list_display = ('item', 'qty', 'total_amt', 'pur_date')
 
     readonly_fields = ['total_amt', ]
 
 
 @admin.register(SaleItem)
 class CustomerPagination(admin.ModelAdmin):
-    list_display = ('item', 'qty', 'item_price', 'total_amt', 'sale_date')
+    list_display = ('item', 'qty', 'total_amt', 'sale_date')
 
     readonly_fields = ['total_amt', ]
 
@@ -72,10 +88,9 @@ class CustomerPagination(admin.ModelAdmin):
 admin.site.register(Vendor)
 admin.site.register(Unit)
 
-admin.site.register(ItemDetail)
+# admin.site.register(ItemDetail)
 
 admin.site.register(Customer)
-admin.site.register(Price_List)
 admin.site.register(Payment_Entry)
 
 

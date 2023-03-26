@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.utils.crypto import get_random_string
+import secrets
 
 
 # Vendor
@@ -39,7 +40,8 @@ class SaleInvoice(models.Model):
         ('مدفوع', 'مدفوع'),
         ('غير مدفوع', 'غير مدفوع'),
     )
-    invoice_number = models.SlugField(editable=False)
+    invoice_number = models.CharField(max_length=8, unique=True, editable=False)
+
     customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
     piad = models.BooleanField(default='No')
     date = models.DateTimeField()
@@ -48,33 +50,31 @@ class SaleInvoice(models.Model):
         verbose_name_plural = '3. Sale Invoice'
 
     def save(self, *args, **kwargs):
-        CODE_LENGTH = 5
-        #
-        # # self.p_search = '-'.join((slugify(self.project_name),))
-        self.invoice_number = 'SINV-' + get_random_string(CODE_LENGTH).upper()
-
+        if not self.invoice_number:
+            # Generate a random 8 character invoice number
+            self.invoice_number = secrets.token_hex(4).upper()
         super().save(*args, **kwargs)
 
     def __str__(self):
         return str(self.invoice_number)
-
+    def total_sales_amount(self):
+        total_sales_amount = self.saleitem_set.aggregate(total=Sum('total_amt'))['total']
+        return total_sales_amount or 0
 
 class Payment_Entry(models.Model):
-    invoice_number = models.SlugField(editable=False)
+    invoice_number = models.CharField(max_length=8, unique=True, editable=False)
     sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
     customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
     paid_amount = models.FloatField(blank=True)
     payment_date = models.DateTimeField(blank=True)
     note = models.TextField(blank=True)
-    old_balance = models.DecimalField(max_digits=20, decimal_places=2, default=0,editable=False)
+    old_balance = models.DecimalField(max_digits=20, decimal_places=2, default=0, editable=False)
 
     def save(self, *args, **kwargs):
-        CODE_LENGTH = 5
-
-        # self.p_search = '-'.join((slugify(self.project_name),))
-        self.invoice_number = 'PINV-' + get_random_string(CODE_LENGTH).upper()
-
+        if not self.invoice_number:
+            # Generate a random 8 character invoice number
+            self.invoice_number = secrets.token_hex(4).upper()
         super().save(*args, **kwargs)
 
     class Meta:
@@ -102,52 +102,58 @@ class Unit(models.Model):
 
 
 # Item Details
-class ItemDetail(models.Model):
-    title = models.CharField(max_length=50)
-    detail = models.TextField(blank=True)
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+class Item(models.Model):
+    PRICELIST = (
+        ('مفرد', 'مفرد'),
+        ('جملة', 'جملة'),
 
-    # photo = models.ImageField(upload_to="product/")
-    class Meta:
-        verbose_name_plural = '7. Items Detail'
+        ('شراء', 'شراء'),
+    )
 
-    def __str__(self):
-        return self.title
-
-
-class Price_List(models.Model):
-    price_list = models.CharField(max_length=50, blank=True)
-
-    def __str__(self):
-        return str(self.price_list)
+    name = models.CharField(max_length=255)
+    price = models.PositiveIntegerField(default=1)
+    price_list = models.CharField(max_length=8, choices=PRICELIST, default='مفرد')
 
     class Meta:
-        verbose_name_plural = 'Price_List'
-
-
-# Price List
-class ItemPrice(models.Model):
-    # PRICELIST = (
-    #     ('مفرد', 'مفرد'),
-    #     ('جملة', 'جملة'),
-    #
-    #     ('شراء', 'شراء'),
-    # )
-
-    item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
-    price_list = models.ForeignKey(Price_List, on_delete=models.CASCADE)
-    item_price = models.FloatField()
-
-    class Meta:
-        verbose_name_plural = '6. Item Price'
+        verbose_name_plural = 'مواد'
 
     def __str__(self):
-        return f'{self.item_price},{self.price_list}'
+        return f"{self.name} - {self.price} - {self.price_list}"
+
+
+# class Price_List(models.Model):
+#     price_list = models.CharField(max_length=50, blank=True)
+#
+#     def __str__(self):
+#         return str(self.price_list)
+#
+#     class Meta:
+#         verbose_name_plural = 'Price_List'
+#
+#
+# # Price List
+# class ItemPrice(models.Model):
+#     # PRICELIST = (
+#     #     ('مفرد', 'مفرد'),
+#     #     ('جملة', 'جملة'),
+#     #
+#     #     ('شراء', 'شراء'),
+#     # )
+#
+#     item = models.ForeignKey(Item, on_delete=models.CASCADE)
+#     price_list = models.ForeignKey(Price_List, on_delete=models.CASCADE)
+#     item_price = models.FloatField()
+#
+#     class Meta:
+#         verbose_name_plural = '6. Item Price'
+#
+#     def __str__(self):
+#         return f'{self.item_price},{self.price_list}'
 
 
 # Purchase Invoice
 class Purchase(models.Model):
-    invoice_number = models.SlugField(default=0)
+    invoice_number = models.CharField(max_length=8, unique=True, editable=False)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     date = models.DateTimeField()
 
@@ -155,17 +161,21 @@ class Purchase(models.Model):
         verbose_name_plural = '8. Purchase Invoice'
 
     def save(self, *args, **kwargs):
-        CODE_LENGTH = 5
-
-        # self.p_search = '-'.join((slugify(self.project_name),))
-        self.invoice_number = 'PINV-' + get_random_string(CODE_LENGTH).upper()
-
+        if not self.invoice_number:
+            # Generate a random 8 character invoice number
+            self.invoice_number = secrets.token_hex(4).upper()
         super().save(*args, **kwargs)
+
+    def clean(self):
+        if PurchaseItem.item is None:
+            raise ValidationError('Please select an Item')
 
     def __str__(self):
         return f' {self.invoice_number}'
 
-
+    def total_purchase_amount(self):
+        total_purchase_amount = self.purchaseitem_set.aggregate(total=Sum('total_amt'))['total']
+        return total_purchase_amount or 0
 # payment entry
 
 
@@ -173,16 +183,16 @@ class Purchase(models.Model):
 class SaleItem(models.Model):
     sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
 
-    item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
     qty = models.PositiveSmallIntegerField(default=1)
-    item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
+    # item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
     total_amt = models.FloatField(editable=False, default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
 
-        self.total_amt = self.qty * self.item_price.item_price
+        self.total_amt = self.qty * self.item.price
         # self.total_amt = self.total_amt - self.payment_entry.paid_amount
         # item_in_stock = PurchaseItem.objects.filter(item=self.item).first()
         # if item_in_stock:
@@ -205,6 +215,10 @@ class SaleItem(models.Model):
             total_bal_qty=totalBal
         )
 
+    def clean(self):
+        if self.item.price_list != 'مفرد':
+            raise ValidationError('Price list should  be " مفرد or جملة"')
+
     class Meta:
         verbose_name_plural = '9. Sales Item'
 
@@ -212,16 +226,16 @@ class SaleItem(models.Model):
 # Purchased Item
 class PurchaseItem(models.Model):
     purchase_invoice = models.ForeignKey(Purchase, on_delete=models.CASCADE)
-    item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
     qty = models.FloatField()
-    item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
+    # item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
     total_amt = models.FloatField(editable=False, default=0)
     pur_date = models.DateTimeField(auto_now_add=True)
     note = models.TextField(blank=True)
 
     def save(self, *args, **kwargs):
-        self.total_amt = self.qty * self.item_price.item_price
+        self.total_amt = self.qty * self.item.price
         super(PurchaseItem, self).save(*args, **kwargs)
 
         inventory = Inventory.objects.filter(item=self.item).order_by('-id').first()
@@ -238,13 +252,19 @@ class PurchaseItem(models.Model):
             total_bal_qty=totalBal
         )
 
+    def clean(self):
+        if self.item.price_list != 'شراء':
+            raise ValidationError('Price list should be "شراء"')
+
     class Meta:
         verbose_name_plural = '9. Purchased Item'
 
 
+
+
 # Inventories
 class Inventory(models.Model):
-    item = models.ForeignKey(ItemDetail, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, default=0, null=True)
     sale = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE, default=0, null=True)
     pur_qty = models.FloatField(default=0, null=True)

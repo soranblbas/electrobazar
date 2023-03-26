@@ -15,7 +15,7 @@ def index(request):
     t_purchase = Purchase.objects.select_related().count()
     t_p_sale = PurchaseItem.objects.values_list().aggregate(Sum('total_amt'))
 
-    t_item = ItemDetail.objects.select_related().count()
+    t_item = Item.objects.select_related().count()
     t_customer = Customer.objects.select_related().count()
 
     context = {'t_sale_invoice': t_sale_invoice, 't_sale': t_sale,
