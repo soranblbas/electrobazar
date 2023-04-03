@@ -1,4 +1,9 @@
+from importlib.resources import _
+
 from django.contrib import admin
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 from .models import *
 
 
@@ -26,6 +31,18 @@ class ProfileAdmin(admin.ModelAdmin):
     #     return format_html('<b>{}</b>', total_sales)
 
     list_display = ('invoice_number', 'customer_name', 'total_sales_amount', 'date')
+
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        if request.method == 'POST':
+            try:
+                return super().changeform_view(request, object_id=object_id, form_url=form_url,
+                                               extra_context=extra_context)
+            except ValueError as error:
+                self.message_user(request, _(str(error)), level='ERROR')
+                url = reverse('admin:%s_%s_change' % (self.opts.app_label, self.opts.model_name), args=[object_id])
+                return HttpResponseRedirect(url)
+        else:
+            return super().changeform_view(request, object_id=object_id, form_url=form_url, extra_context=extra_context)
 
 
 class PurchasesItem(admin.TabularInline):
@@ -92,7 +109,6 @@ admin.site.register(Unit)
 
 admin.site.register(Customer)
 admin.site.register(Payment_Entry)
-
 
 admin.site.site_header = "Electro Bazar Admin"
 admin.site.site_title = "Electro Bazar Admin Portal"

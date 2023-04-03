@@ -57,9 +57,11 @@ class SaleInvoice(models.Model):
 
     def __str__(self):
         return str(self.invoice_number)
+
     def total_sales_amount(self):
         total_sales_amount = self.saleitem_set.aggregate(total=Sum('total_amt'))['total']
         return total_sales_amount or 0
+
 
 class Payment_Entry(models.Model):
     invoice_number = models.CharField(max_length=8, unique=True, editable=False)
@@ -176,6 +178,8 @@ class Purchase(models.Model):
     def total_purchase_amount(self):
         total_purchase_amount = self.purchaseitem_set.aggregate(total=Sum('total_amt'))['total']
         return total_purchase_amount or 0
+
+
 # payment entry
 
 
@@ -200,7 +204,19 @@ class SaleItem(models.Model):
 
         super(SaleItem, self).save(*args, **kwargs)
 
-        inventory = Inventory.objects.filter(item=self.item).order_by('-id').first()
+        try:
+            inventory = Inventory.objects.filter(item__name=self.item.name).latest('id')
+        except Inventory.DoesNotExist:
+            raise ValueError(f"{self.item.name} is not in stock")
+
+        totalBal = inventory.total_bal_qty
+        if self.qty > totalBal:
+            raise ValueError(
+                f"Sorry, we don't have enough {self.item.name} in stock right now. "
+                f"Please reduce your sale quantity to {totalBal} or less."
+            )
+
+        inventory = Inventory.objects.filter(item__name=self.item.name).order_by('-id').first()
         if inventory:
             totalBal = inventory.total_bal_qty - self.qty
         else:
@@ -258,8 +274,6 @@ class PurchaseItem(models.Model):
 
     class Meta:
         verbose_name_plural = '9. Purchased Item'
-
-
 
 
 # Inventories
