@@ -193,6 +193,7 @@ class SaleItem(models.Model):
     # price = models.FloatField()
     total_amt = models.FloatField(editable=False, default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
+    note = models.CharField(max_length=200, blank=True)
 
     def save(self, *args, **kwargs):
 
@@ -254,7 +255,7 @@ class PurchaseItem(models.Model):
         self.total_amt = self.qty * self.item.price
         super(PurchaseItem, self).save(*args, **kwargs)
 
-        inventory = Inventory.objects.filter(item=self.item).order_by('-id').first()
+        inventory = Inventory.objects.filter(item__name=self.item.name).order_by('-id').first()
         if inventory:
             totalBal = inventory.total_bal_qty + self.qty
         else:

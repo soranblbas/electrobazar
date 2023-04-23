@@ -139,3 +139,12 @@ def customer_total_report_summary(request):
     return render(request, 'electro/reports/total_customer_summary_report.html', context)
 
 
+def item_balance(request):
+    items = Inventory.objects.values('item__name').annotate(
+        pur_qty=Sum('pur_qty'),
+        sale_qty=Sum('sale_qty')
+    )
+    for item in items:
+        item['balance'] = item['pur_qty'] - item['sale_qty']
+    context = {'items': items}
+    return render(request, 'electro/reports/item_balance.html', context)
