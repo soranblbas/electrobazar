@@ -45,6 +45,7 @@ class SaleInvoice(models.Model):
     customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
     piad = models.BooleanField(default='No')
     date = models.DateTimeField()
+    note = models.CharField(max_length=100, blank=True)
 
     class Meta:
         verbose_name_plural = '3. Sale Invoice'
@@ -193,7 +194,6 @@ class SaleItem(models.Model):
     # price = models.FloatField()
     total_amt = models.FloatField(editable=False, default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
-    note = models.CharField(max_length=200, blank=True)
 
     def save(self, *args, **kwargs):
 

@@ -16,5 +16,6 @@ urlpatterns = [
     # path('customer_balance', views.customer_balance, name="customer_balance"),
     path('total_customer_summary_report', views.customer_total_report_summary, name="total_customer_summary_report"),
     path('item-balance', views.item_balance, name='item_balance'),
+    path('single-sale/<str:pk_test>/', views.single_sale, name="single_sale"),
 
 ]

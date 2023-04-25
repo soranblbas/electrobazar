@@ -148,3 +148,14 @@ def item_balance(request):
         item['balance'] = item['pur_qty'] - item['sale_qty']
     context = {'items': items}
     return render(request, 'electro/reports/item_balance.html', context)
+
+
+def single_sale(request, pk_test):
+    try:
+        s_invoice_list = SaleInvoice.objects.get(id=pk_test)
+        s_item_list = SaleItem.objects.filter(sales_invoice=pk_test)
+
+        context = {'s_invoice_list': s_invoice_list, 's_item_list': s_item_list, }
+        return render(request, 'electro/reports/single_sale_report.html', context)
+    except:
+        return render(request, 'electro/reports/single_sale_report.html')
