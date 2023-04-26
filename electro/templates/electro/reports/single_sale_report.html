@@ -1,6 +1,13 @@
 {% extends 'electro/base.html' %}
 {% load static %}
 {% block content %}
+    <style>
+        @media print {
+            #options {
+                display: none;
+            }
+        }
+    </style>
 
 
     <br>
@@ -17,7 +24,10 @@
                             <i class="fab fa-mdb fa-4x ms-0" style="color:#5d9fc5 ;"></i>
                             <p class="pt-0"><img src="{% static 'electro/assets/img/electro_invoice_logo.jpg' %}"></p>
                         </div>
-
+    <div id="options">
+        <a class="btn btn-light text-capitalize border-0 id=print-button" data-mdb-ripple-color="dark"
+           onclick="printInvoice()"><i class="fas fa-print text-primary"></i> Print</a>
+    </div>
                     </div>
 
 
@@ -94,11 +104,7 @@
 
                     </div>
                 </div>
-                <div id="options">
-                    <a class="btn btn-light text-capitalize border-0 id=print-button" data-mdb-ripple-color="dark"
-                       onclick="printInvoice()"><i
-                            class="fas fa-print text-primary"></i> Print</a>
-                </div>
+
 
             </div>
         </div>
