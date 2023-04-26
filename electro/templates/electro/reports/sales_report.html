@@ -7,6 +7,7 @@
     <style>
         table, th, td {
             border: 0.5px solid;
+            direction: rtl;
 
         }
 
@@ -29,7 +30,7 @@
 
     </form>
     <h2 class="text-center"> ملخص المبيعات </h2>
-    <table id="example1" class="table table-striped" style="background-color: #68a7e5">
+    <table id="example1" class="table table-striped" style="background-color: #68a7e5" dir="rtl">
 
         <thead>
 
@@ -38,7 +39,6 @@
 
             <th>رقم الوصل</th>
             <th>اسم العميل</th>
-            <th>الحالة</th>
             <th>اسم المادة</th>
             <th>السعر</th>
             <th>العدد</th>
@@ -55,7 +55,6 @@
             <td><a href="{% url 'single_sale' i.sales_invoice.id  %}">{{ i.sales_invoice.invoice_number }}</a></td>
 
         <td>{{ i.sales_invoice.customer_name }}</td>
-        <td>{{ i.sales_invoice.status }}</td>
         <td>{{ i.item }}</td>
         <td>{{ i.item.price }}</td>
         <td>{{ i.qty }}</td>
@@ -69,7 +68,6 @@
         </tbody>
         <tfoot>
 
-        <th></th>
         <th></th>
         <th></th>
         <th></th>
