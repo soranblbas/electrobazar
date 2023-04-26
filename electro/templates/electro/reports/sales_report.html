@@ -39,6 +39,7 @@
 
             <th>رقم الوصل</th>
             <th>اسم العميل</th>
+            <th>الحالة</th>
             <th>اسم المادة</th>
             <th>السعر</th>
             <th>العدد</th>
@@ -55,6 +56,7 @@
             <td><a href="{% url 'single_sale' i.sales_invoice.id  %}">{{ i.sales_invoice.invoice_number }}</a></td>
 
         <td>{{ i.sales_invoice.customer_name }}</td>
+        <td>{{ i.sales_invoice.status }}</td>
         <td>{{ i.item }}</td>
         <td>{{ i.item.price }}</td>
         <td>{{ i.qty }}</td>
@@ -68,6 +70,7 @@
         </tbody>
         <tfoot>
 
+        <th></th>
         <th></th>
         <th></th>
         <th></th>

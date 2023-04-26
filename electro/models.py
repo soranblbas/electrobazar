@@ -15,7 +15,7 @@ class Vendor(models.Model):
     note = models.TextField(blank=True)
 
     class Meta:
-        verbose_name_plural = '1. Vendors'
+        verbose_name_plural = '1. کۆمپانیاکان'
 
     def __str__(self):
         return self.full_name
@@ -29,7 +29,7 @@ class Customer(models.Model):
     city = models.CharField(max_length=50, blank=True)
 
     class Meta:
-        verbose_name_plural = '2. Customers'
+        verbose_name_plural = '2. کڕیار'
 
     def __str__(self):
         return self.customer_name
@@ -39,16 +39,17 @@ class SaleInvoice(models.Model):
     STATUS = (
         ('مدفوع', 'مدفوع'),
         ('غير مدفوع', 'غير مدفوع'),
+        ('قسط ', ' قسط'),
     )
     invoice_number = models.CharField(max_length=8, unique=True, editable=False)
 
     customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    piad = models.BooleanField(default='No')
+    status = models.CharField(max_length=10,choices=STATUS, default='مدفوع')
     date = models.DateTimeField()
     note = models.CharField(max_length=100, blank=True)
 
     class Meta:
-        verbose_name_plural = '3. Sale Invoice'
+        verbose_name_plural = '3. پسولەی فرۆشتن'
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:
@@ -81,7 +82,7 @@ class Payment_Entry(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name_plural = '8. Payment Entry'
+        verbose_name_plural = '8. پارەدان'
 
     def __str__(self):
         return str(self.sales_invoice.invoice_number)
@@ -98,7 +99,7 @@ class Unit(models.Model):
     short_name = models.CharField(max_length=50)
 
     class Meta:
-        verbose_name_plural = '5. Units'
+        verbose_name_plural = '5. یەکەی پێوان'
 
     def __str__(self):
         return self.title
@@ -111,6 +112,7 @@ class Item(models.Model):
         ('جملة', 'جملة'),
 
         ('شراء', 'شراء'),
+        ('قسط', 'قسط'),
     )
 
     name = models.CharField(max_length=255)
@@ -161,7 +163,7 @@ class Purchase(models.Model):
     date = models.DateTimeField()
 
     class Meta:
-        verbose_name_plural = '8. Purchase Invoice'
+        verbose_name_plural = '8. زیادکردن بۆ کۆگا'
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:
@@ -287,7 +289,7 @@ class Inventory(models.Model):
     total_bal_qty = models.FloatField(default=0)
 
     class Meta:
-        verbose_name_plural = '10. Stock Details'
+        verbose_name_plural = '10. زانیاری کۆگا'
 
     def __str__(self):
         return str(self.item)
