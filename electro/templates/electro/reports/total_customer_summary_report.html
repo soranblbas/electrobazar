@@ -7,6 +7,7 @@
     <style>
         table, th, td {
             border: 0.5px solid;
+            direction: rtl;
 
         }
 
@@ -45,9 +46,9 @@
                 <td>{{ data.balance_before_last_payment }}</td>
                 <td>{{ data.last_payment }}</td>
                 <td>{{ data.actual_credit }}</td>
-
             </tr>
         {% endfor %}
+
         </tbody>
         <tfoot>
 
@@ -57,7 +58,7 @@
         <th style="background-color: #beecc8"></th>
 
         <th style="background-color: #e8c3c7"></th>
-           <th style="background-color: #e8c3c7"></th>
+        <th style="background-color: #e8c3c7"></th>
 
 
         </tfoot>

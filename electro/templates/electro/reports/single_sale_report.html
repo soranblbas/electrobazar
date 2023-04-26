@@ -1,19 +1,8 @@
 {% extends 'electro/base.html' %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" type="text/css" href="{% static 'electro/assets/css/print.css' %}" media="print">
 
-    <style type="text/css" media="print">
-        @page {
-            size: auto;
-            margin: 0;
-            direction: rtl;
-        }
 
-       card {
-            direction: rtl;
-        }
-    </style>
     <br>
     <br> <br>
     <div class="card" dir="rtl" id="invoice-print-area">
@@ -98,7 +87,7 @@
                         </div>
                     </div>
                     <hr>
-                    <div class="row">
+                    <div class="row" dir="rtl">
                         <div class="col-xl-10">
                             <p class="ms-3">تێبینی: {{ s_invoice_list.note }}</p>
                         </div>

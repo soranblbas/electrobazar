@@ -121,7 +121,7 @@ def customer_total_report_summary(request):
         customer_name = Customer.objects.get(id=customer_id).customer_name
 
         sale_items = SaleItem.objects.filter(sales_invoice__customer_name_id=customer_id)
-        payments = Payment_Entry.objects.filter(customer_name_id=customer_id).order_by('-payment_date')
+        payments = Payment_Entry.objects.filter(sales_invoice__customer_name_id=customer_id).order_by('-payment_date')
 
         total_invoice_amount = sum(sale_item.total_amt for sale_item in sale_items)
         total_paid_amount = sum(payment.paid_amount for payment in payments)
@@ -162,3 +162,6 @@ def single_sale(request, pk_test):
         return render(request, 'electro/reports/single_sale_report.html', context)
     except:
         return render(request, 'electro/reports/single_sale_report.html')
+
+
+

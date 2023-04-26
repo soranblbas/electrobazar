@@ -57,7 +57,7 @@ class SaleInvoice(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.invoice_number)
+        return f"{self.customer_name} - {self.invoice_number} - {self.total_sales_amount()}"
 
     def total_sales_amount(self):
         total_sales_amount = self.saleitem_set.aggregate(total=Sum('total_amt'))['total']
@@ -67,7 +67,7 @@ class SaleInvoice(models.Model):
 class Payment_Entry(models.Model):
     invoice_number = models.CharField(max_length=8, unique=True, editable=False)
     sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
-    customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    # customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
     paid_amount = models.FloatField(blank=True)
     payment_date = models.DateTimeField(blank=True)
