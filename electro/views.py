@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -58,9 +60,10 @@ def logoutUser(request):
 # repoerting
 def sales_repoert(request):
     s_reports = SaleItem.objects.select_related()
+    s_inv_reports = SaleInvoice.objects.select_related()
     myFilter = Sales_Filter(request.GET, queryset=s_reports)
     s_reports = myFilter.qs
-
+    reports = list(chain(s_reports, s_inv_reports))
     context = {'s_reports': s_reports, 'myFilter': myFilter}
     return render(request, 'electro/reports/sales_report.html', context)
 

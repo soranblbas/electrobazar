@@ -49,24 +49,23 @@
         </tr>
         </thead>
         <tbody>
-        {% for i in  s_reports %}
+{% for i in s_reports %}
+    <tr>
 
-            <tr>
+            <td><a href="{% url 'single_sale' i.sales_invoice.id  %}">{{ i.sales_invoice.invoice_number }}</a></td>
 
-                <td><a href="{% url 'single_sale' i.id %}">{{ i.sales_invoice.invoice_number }}  </a>
-                </td>
+        <td>{{ i.sales_invoice.customer_name }}</td>
+        <td>{{ i.sales_invoice.status }}</td>
+        <td>{{ i.item }}</td>
+        <td>{{ i.item.price }}</td>
+        <td>{{ i.qty }}</td>
+        <td>{{ i.total_amt }}</td>
+        <td>{{ i.sale_date }}</td>
+    </tr>
+{% endfor %}
 
-                <td>{{ i.sales_invoice.customer_name }}</td>
-                <td>{{ i.sales_invoice.status }}</td>
-                <td>{{ i.item }}</td>
-                <td>{{ i.item.price }}</td>
-                <td>{{ i.qty }}</td>
-                <td>{{ i.total_amt }}</td>
-                <td>{{ i.sale_date }}</td>
 
 
-            </tr>
-        {% endfor %}
         </tbody>
         <tfoot>
 
