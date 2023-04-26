@@ -27,12 +27,12 @@
 
         <tr>
 
-            <th>اسم العميل</th>
-            <th>المبيعات</th>
-            <th>التسديدات</th>
-            <th> الرصيد قبل الدفعة الأخيرة</th>
-            <th> اخر‌التسديدات</th>
-            <th>المتبقي</th>
+            <th>وەرگیراوە لە بەرێز</th>
+            <th>سەرجەم</th>
+            <th>بری پارەی دراو</th>
+            <th> بری پارەی پێشوو</th>
+            <th> بری دوا پارەی دراو</th>
+            <th>بری پارەی ماوە</th>
 
 
         </tr>
@@ -41,11 +41,11 @@
         {% for customer, data in c_balance_report.items %}
             <tr>
                 <td>{{ customer }}</td>
-                <td>{{ data.total_invoice_amount }}</td>
-                <td>{{ data.total_paid_amount }}</td>
-                <td>{{ data.balance_before_last_payment }}</td>
-                <td>{{ data.last_payment }}</td>
-                <td>{{ data.actual_credit }}</td>
+                <td>${{ data.total_invoice_amount }}</td>
+                <td>${{ data.total_paid_amount }}</td>
+                <td>${{ data.balance_before_last_payment }}</td>
+                <td>${{ data.last_payment }}</td>
+                <td>${{ data.actual_credit }}</td>
             </tr>
         {% endfor %}
 
