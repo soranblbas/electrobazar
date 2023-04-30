@@ -30,7 +30,8 @@ class ProfileAdmin(admin.ModelAdmin):
     #     total_sales = sum(sale.total_amt for sale in obj.sales.all())
     #     return format_html('<b>{}</b>', total_sales)
 
-    list_display = ('invoice_number', 'customer_name', 'total_sales_amount', 'date')
+    list_display = (
+        'invoice_number', 'customer_name', 'total_sub_amount', 'total_discount_amount', 'total_sales_amount', 'date')
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         if request.method == 'POST':

@@ -41,10 +41,10 @@ class SaleInvoice(models.Model):
         ('غير مدفوع', 'غير مدفوع'),
         ('قسط ', ' قسط'),
     )
-    invoice_number = models.CharField(max_length=8, unique=True, editable=False)
+    invoice_number = models.CharField(unique=True, editable=False, max_length=10)
 
     customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10,choices=STATUS, default='مدفوع')
+    status = models.CharField(max_length=10, choices=STATUS, default='مدفوع')
     date = models.DateTimeField()
     note = models.CharField(max_length=100, blank=True)
 
@@ -53,8 +53,15 @@ class SaleInvoice(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:
-            # Generate a random 8 character invoice number
-            self.invoice_number = secrets.token_hex(4).upper()
+            # Get the highest existing invoice number
+            highest = SaleInvoice.objects.aggregate(models.Max('invoice_number'))['invoice_number__max']
+            if highest is None:
+                # If no invoices exist yet, start at 100
+                self.invoice_number = 'SINV-100'
+            else:
+                # Increment the highest invoice number by 1 and add prefix
+                prefix, number = highest.split('-')
+                self.invoice_number = prefix + '-' + str(int(number) + 1)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -63,6 +70,14 @@ class SaleInvoice(models.Model):
     def total_sales_amount(self):
         total_sales_amount = self.saleitem_set.aggregate(total=Sum('total_amt'))['total']
         return total_sales_amount or 0
+
+    def total_sub_amount(self):
+        total_sales_amount = self.saleitem_set.aggregate(total=Sum('sub_total'))['total']
+        return total_sales_amount or 0
+
+    def total_discount_amount(self):
+        total_discount_amount = self.saleitem_set.aggregate(total=Sum('discount_value'))['total']
+        return total_discount_amount or 0
 
 
 class Payment_Entry(models.Model):
@@ -194,16 +209,25 @@ class SaleItem(models.Model):
     qty = models.PositiveSmallIntegerField(default=1)
     # item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
+    sub_total = models.FloatField(editable=False, default=0)
     total_amt = models.FloatField(editable=False, default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
+    discount_type = models.CharField(max_length=10, choices=(
+        ('amount', 'Amount'),
+        ('percentage', 'Percentage')
+    ), blank=True)
+    discount_value = models.FloatField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        self.sub_total = self.item.price * self.qty
+        if self.discount_type == 'amount' and self.discount_value is not None:
+            discount = self.discount_value
+        elif self.discount_type == 'percentage' and self.discount_value is not None:
+            discount = self.item.price * self.discount_value / 100
+        else:
+            discount = 0
 
-        self.total_amt = self.qty * self.item.price
-        # self.total_amt = self.total_amt - self.payment_entry.paid_amount
-        # item_in_stock = PurchaseItem.objects.filter(item=self.item).first()
-        # if item_in_stock:
-        #     raise ValidationError("Quantity cannot be greater than the stock amount.")
+        self.total_amt = (self.qty * self.item.price) - discount
 
         super(SaleItem, self).save(*args, **kwargs)
 
@@ -237,6 +261,8 @@ class SaleItem(models.Model):
     def clean(self):
         if self.item.price_list != 'مفرد':
             raise ValidationError('Price list should  be " مفرد or جملة"')
+        if not self.discount_type and self.discount_value:
+            raise ValidationError('Please select a discount type')
 
     class Meta:
         verbose_name_plural = '9. Sales Item'
