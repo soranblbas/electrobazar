@@ -87,18 +87,57 @@
                 {
                     extend: 'print',
                     footer: true,
-                    title: '<p dir="rtl" class="pt-0"><img src="{% static 'electro/assets/img/electro_invoice_logo.jpg' %}"> كشف الحساب المبيعات</p>',
+                    title: '<p dir="rtl" class="pt-0"><img src="{% static 'electro/assets/img/electro_invoice_logo.jpg' %}"> </p>',
                     customize: function (win) {
+                        // Add logo
+                        var logo = '<img src="{% static "electro/assets/img/electro_invoice_logo.jpg" %}" class="logo">';
                         $(win.document.body)
                             .css('font-size', '10pt')
-                            .prepend(
-                                {#'<img src="http://datatables.net/media/images/logo-fade.png" style="position:relative; top:0; left:0;" />'#}
-                            );
+                            .prepend('<div class="logo-container">' + logo + '</div>');
 
+                        // Add footer with image and text
+                        var footer = '<div class="footer"><img src="your-image-url" class="footer-image">Your footer text goes here</div>';
+                        $(win.document.body)
+                            .append(footer);
+
+                        // Style logo, footer, and image
+                        $(win.document.body).find('.logo-container')
+                            .css({
+                                'position': 'fixed',
+                                'bottom': '0',
+                                'left': '0',
+                                'right': '0',
+                                'text-align': 'center'
+                            });
+                        $(win.document.body).find('.logo')
+                            .css({
+                                'max-width': '100%',
+                                'height': 'auto'
+                            });
+                        $(win.document.body).find('.footer')
+                            .css({
+                                'position': 'fixed',
+                                'bottom': '20px',
+                                'left': '0',
+                                'right': '0',
+                                'text-align': 'center',
+                                'font-size': '10pt'
+                            });
+                        $(win.document.body).find('.footer-image')
+                            .css({
+                                'max-width': '100%',
+                                'height': 'auto',
+                                'vertical-align': 'middle',
+                                'margin-right': '5px'
+                            });
+
+                        // Style table
                         $(win.document.body).find('table')
                             .addClass('compact')
                             .css('font-size', 'inherit');
                     }
+
+
                 }
             ],
 
@@ -110,7 +149,7 @@
                 //to show first th
                 $(api.column(0).footer()).html('Total');
 
-                for (var i = 7; i <= 9; i+=2) {
+                for (var i = 7; i <= 9; i += 2) {
                     sum = api.column(i, {page: 'current'}).data().sum();
 
                     //to format this sum

@@ -32,6 +32,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
     list_display = (
         'invoice_number', 'customer_name', 'total_sub_amount', 'total_discount_amount', 'total_sales_amount', 'date')
+    list_filter = ('status',)
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         if request.method == 'POST':
