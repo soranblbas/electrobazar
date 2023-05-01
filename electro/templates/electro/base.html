@@ -408,7 +408,7 @@
                 {
                     extend: 'print',
                     footer: true,
-                    title: '<p dir="rtl" class="pt-0"><img src="{% static 'electro/assets/img/electro_invoice_logo.jpg' %}"> ملخص كشف العملاء</p>',
+                    title: '<p dir="rtl" class="pt-0"><img src="{% static 'electro/assets/img/electro_invoice_logo.jpg' %}"></p>',
 
 
                     customize: function (win) {
@@ -421,6 +421,21 @@
                         $(win.document.body).find('table')
                             .addClass('compact')
                             .css('font-size', 'inherit');
+
+                        // Add footer with image and text
+                        var footer = '<div class="footer"><img src="your-image-url" class="footer-image">ناونیشان / هەولێر گەرەکی گەلاوێژ بەرامبەر مارکێتی شیاو</div>';
+                        $(win.document.body)
+                            .append(footer);
+                        // Style logo, footer, and image
+                        $(win.document.body).find('.footer')
+                            .css({
+                                'position': 'fixed',
+                                'bottom': '0',
+                                'left': '0',
+                                'right': '0',
+                                'text-align': 'center',
+                                'font-size': '14px'
+                            });
                     }
                 }
             ],

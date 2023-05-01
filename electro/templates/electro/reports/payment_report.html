@@ -38,6 +38,7 @@
             <th>اسم العميل</th>
             <th>رقم الوصل</th>
             <th>رقم الوصل المبیعات</th>
+            <th>نوع الدفع</th>
             <th>نسبە الدفع</th>
             <th>التاريخ</th>
             <th>الملاحضة</th>
@@ -51,7 +52,8 @@
             <tr>
                 <td>{{ i.sales_invoice.customer_name }}</td>
                 <td>{{ i.invoice_number }}</td>
-                <td>{{ i.sales_invoice }}</td>
+                <td>{{ i.sales_invoice.invoice_number }}</td>
+                <td>{{ i.q_type }}</td>
                 <td>{{ i.paid_amount }}</td>
                 <td>{{ i.payment_date }}</td>
                 <td>{{ i.note }}</td>
@@ -63,12 +65,12 @@
 
         <th></th>
         <th></th>
-  <th></th>
+        <th></th>
         <th style="background-color: #e8c3c7"></th>
 
         <th></th>
         <th></th>
-
+        <th></th>
 
         </tfoot>
 

@@ -81,20 +81,33 @@ class SaleInvoice(models.Model):
 
 
 class Payment_Entry(models.Model):
-    invoice_number = models.CharField(max_length=8, unique=True, editable=False)
+    Qst = (
+        ('نقد', 'نقد'),
+        ('قستی ١', 'قستی ١'),
+        ('قستی ٢', 'قستی ٢'),
+        ('قستی ٣ ', ' قستی ٣'),
+        ('قستی ٤', 'قستی ٤'),
+        ('قستی ٥', 'قستی ٥'),
+        ('قستی ٦ ', ' قستی ٦'),
+        ('قستی ٧', 'قستی ٧'),
+        ('قستی ٨', 'قستی ٨'),
+        ('قستی ٩ ', ' قستی ٩'),
+        ('قستی ١٠', 'قستی ١٠'),
+        ('قستی ١١', 'قستی ١١'),
+        ('قستی ١٢ ', ' قستی ١٢'),
+    )
+
+    invoice_number = models.CharField(unique=True, editable=False, max_length=10)
     sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
     # customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    q_type = models.CharField(max_length=10, verbose_name="Payment type", choices=Qst, blank=False)
 
-    paid_amount = models.FloatField(blank=True)
-    payment_date = models.DateTimeField(blank=True)
-    note = models.TextField(blank=True)
+    paid_amount = models.PositiveIntegerField(blank=False, default=1)
+    payment_date = models.DateTimeField(blank=False)
+    note = models.CharField(max_length=100, blank=True)
     old_balance = models.DecimalField(max_digits=20, decimal_places=2, default=0, editable=False)
 
-    def save(self, *args, **kwargs):
-        if not self.invoice_number:
-            # Generate a random 8 character invoice number
-            self.invoice_number = secrets.token_hex(4).upper()
-        super().save(*args, **kwargs)
+
 
     class Meta:
         verbose_name_plural = '8. پارەدان'
@@ -102,7 +115,22 @@ class Payment_Entry(models.Model):
     def __str__(self):
         return str(self.sales_invoice.invoice_number)
 
+    def clean(self):
+        if not self.q_type:
+            raise ValidationError(' تکایە شێوازی پارەدان هەڵبژێرە؟')
 
+    def save(self, *args, **kwargs):
+        if not self.invoice_number:
+            # Get the highest existing invoice number
+            highest = Payment_Entry.objects.aggregate(models.Max('invoice_number'))['invoice_number__max']
+            if highest is None:
+                # If no invoices exist yet, start at 100
+                self.invoice_number = 'PINV-100'
+            else:
+                # Increment the highest invoice number by 1 and add prefix
+                prefix, number = highest.split('-')
+                self.invoice_number = prefix + '-' + str(int(number) + 1)
+        super().save(*args, **kwargs)
 # Sales Invoice
 
 

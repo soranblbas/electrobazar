@@ -25,7 +25,7 @@
 
         <thead>
 
-        <tr>
+        <tr dir="rtl">
 
             <th>وەرگیراوە لە بەرێز</th>
             <th>سەرجەم</th>
@@ -33,7 +33,7 @@
             <th> بری پارەی پێشوو</th>
             <th> بری دوا پارەی دراو</th>
             <th>بری پارەی ماوە</th>
-
+            <th>موبایل</th>
 
         </tr>
         </thead>
@@ -46,6 +46,7 @@
                 <td>${{ data.balance_before_last_payment }}</td>
                 <td>${{ data.last_payment }}</td>
                 <td>${{ data.actual_credit }}</td>
+                <td>{{ data.phone_number }}</td>
             </tr>
         {% endfor %}
 
@@ -60,7 +61,7 @@
         <th style="background-color: #e8c3c7"></th>
         <th style="background-color: #e8c3c7"></th>
 
-
+ <th style="background-color: #e8c3c7"></th>
         </tfoot>
 
 
