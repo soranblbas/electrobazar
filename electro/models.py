@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Sum
 from django.utils.crypto import get_random_string
@@ -102,12 +103,11 @@ class Payment_Entry(models.Model):
     # customer_name = models.ForeignKey(Customer, on_delete=models.CASCADE)
     q_type = models.CharField(max_length=10, verbose_name="Payment type", choices=Qst, blank=False)
 
-    paid_amount = models.PositiveIntegerField(blank=False, default=1)
+    paid_amount = models.FloatField(validators=[MinValueValidator(0.01)],default=1)
+
     payment_date = models.DateTimeField(blank=False)
     note = models.CharField(max_length=100, blank=True)
     old_balance = models.DecimalField(max_digits=20, decimal_places=2, default=0, editable=False)
-
-
 
     class Meta:
         verbose_name_plural = '8. پارەدان'
@@ -131,6 +131,8 @@ class Payment_Entry(models.Model):
                 prefix, number = highest.split('-')
                 self.invoice_number = prefix + '-' + str(int(number) + 1)
         super().save(*args, **kwargs)
+
+
 # Sales Invoice
 
 
@@ -169,36 +171,6 @@ class Item(models.Model):
         return f"{self.name} - {self.price} - {self.price_list}"
 
 
-# class Price_List(models.Model):
-#     price_list = models.CharField(max_length=50, blank=True)
-#
-#     def __str__(self):
-#         return str(self.price_list)
-#
-#     class Meta:
-#         verbose_name_plural = 'Price_List'
-#
-#
-# # Price List
-# class ItemPrice(models.Model):
-#     # PRICELIST = (
-#     #     ('مفرد', 'مفرد'),
-#     #     ('جملة', 'جملة'),
-#     #
-#     #     ('شراء', 'شراء'),
-#     # )
-#
-#     item = models.ForeignKey(Item, on_delete=models.CASCADE)
-#     price_list = models.ForeignKey(Price_List, on_delete=models.CASCADE)
-#     item_price = models.FloatField()
-#
-#     class Meta:
-#         verbose_name_plural = '6. Item Price'
-#
-#     def __str__(self):
-#         return f'{self.item_price},{self.price_list}'
-
-
 # Purchase Invoice
 class Purchase(models.Model):
     invoice_number = models.CharField(max_length=8, unique=True, editable=False)
@@ -226,9 +198,6 @@ class Purchase(models.Model):
         return total_purchase_amount or 0
 
 
-# payment entry
-
-
 # Sales Item
 class SaleItem(models.Model):
     sales_invoice = models.ForeignKey(SaleInvoice, on_delete=models.CASCADE)
@@ -237,8 +206,8 @@ class SaleItem(models.Model):
     qty = models.PositiveSmallIntegerField(default=1)
     # item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
-    sub_total = models.FloatField(editable=False, default=0)
-    total_amt = models.FloatField(editable=False, default=0)
+    sub_total = models.FloatField(validators=[MinValueValidator(0.01)],default=0)
+    total_amt = models.FloatField(validators=[MinValueValidator(0.01)],default=0,editable=False)
     sale_date = models.DateTimeField(auto_now_add=True)
     discount_type = models.CharField(max_length=10, choices=(
         ('amount', 'Amount'),
@@ -300,12 +269,12 @@ class SaleItem(models.Model):
 class PurchaseItem(models.Model):
     purchase_invoice = models.ForeignKey(Purchase, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    qty = models.FloatField()
+    qty = models.FloatField(validators=[MinValueValidator(0.01)],default=0)
     # item_price = models.ForeignKey(ItemPrice, on_delete=models.CASCADE)
     # price = models.FloatField()
-    total_amt = models.FloatField(editable=False, default=0)
+    total_amt = models.FloatField(validators=[MinValueValidator(0.01)],default=0,editable=False)
     pur_date = models.DateTimeField(auto_now_add=True)
-    note = models.TextField(blank=True)
+    note = models.CharField(max_length=100, blank=True)
 
     def save(self, *args, **kwargs):
         self.total_amt = self.qty * self.item.price
