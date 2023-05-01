@@ -113,7 +113,7 @@ class Payment_Entry(models.Model):
         verbose_name_plural = '8. پارەدان'
 
     def __str__(self):
-        return str(self.sales_invoice.invoice_number)
+        return str(self.invoice_number)
 
     def clean(self):
         if not self.q_type:
