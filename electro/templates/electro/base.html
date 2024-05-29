@@ -14,8 +14,56 @@
             <img src="{% static 'electro/assets/img/logo.png' %}" alt="">
             <span class="d-none d-lg-block">Electro Bazar</span>
         </a>
-        {#        <i class="bi bi-list toggle-sidebar-btn"></i>#}
-    </div><!-- End Logo -->
+        <i class="bi bi-list toggle-sidebar-btn"></i>
+        <aside id="sidebar" class="sidebar">
+        </aside>
+        <!-- Sidebar -->
+        <aside id="sidebar" class="col-lg-3">
+            <div class="sidebar">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <section id="sales" class="section">
+                            <a class="nav-link" href="http://127.0.0.1:8000/admin/electro/saleinvoice/add/">المبيعات</a></section>
+                    </li>
+                    <li class="nav-item">
+                        <section id="purchases" class="section">
+                            <a class="nav-link" href="http://127.0.0.1:8000/admin/electro/purchase/add/">المشتريات</a></section>
+                        </section>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://127.0.0.1:8000/admin/electro/payment_entry/add">التسديدات</a>
+                        <section id="payments" class="section">
+                            <!-- Your payments content goes here -->
+                        </section>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://127.0.0.1:8000/admin/electro/purchase/add/">المخزون</a>
+                        <section id="stock" class="section">
+                            <!-- Your stock content goes here -->
+                        </section>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://127.0.0.1:8000/admin/electro/customer/add/">العملاء</a>
+                        <section id="customers" class="section">
+                            <!-- Your customers content goes here -->
+                        </section>
+                    </li>
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="#expenses">المصاريف</a>#}
+{#                        <section id="expenses" class="section">#}
+{#                            <!-- Your expenses content goes here -->#}
+{#                        </section>#}
+{#                    </li>#}
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin">النظام</a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        <!-- End Sidebar -->
+
+    </div>
+
     <a style="color: #0a58ca" href="{% url 'logout' %}">Logout</a>
 
 </header><!-- End Header -->
